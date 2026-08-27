@@ -1,4 +1,4 @@
-# Nome do projeto: ESTETIFY
+# Nome do projeto: SCHEDULESTY
 
 ## Nome das integrantes:
 - Ana Lívia Carvalho Antunes
@@ -12,13 +12,13 @@
 Pedro Ramires Amalfi da Silva Costa
 
 ## Descrição do projeto:
-O Estetify é um projeto de Trabalho de Conclusão de Curso (TCC) desenvolvido para modernizar e facilitar o agendamento de procedimentos em clínicas de estética. O projeto busca resolver a dificuldade enfrentada por muitas clínicas que ainda utilizam processos manuais ou dependem exclusivamente de ligações e mensagens para marcar atendimentos. Com o Estetify, o processo de agendamento torna-se mais eficiente, proporcionando maior praticidade para os clientes e melhor organização para os estabelecimentos.
+O SchedulEsty é um projeto de Trabalho de Conclusão de Curso (TCC) desenvolvido para modernizar e facilitar o agendamento de procedimentos em clínicas de estética. O projeto busca resolver a dificuldade enfrentada por muitas clínicas que ainda utilizam processos manuais ou dependem exclusivamente de ligações e mensagens para marcar atendimentos. Com o SchedulEsty, o processo de agendamento torna-se mais eficiente, proporcionando maior praticidade para os clientes e melhor organização para os estabelecimentos.
 
 ## Tecnologias utilizadas:
 HTML5, CSS3, JavaScript, PHP, MariaDB, XAMPP e Visual Studio Code (VS Code).
 
 ## Status atual do projeto:
-No momento, a equipe está iniciando a fase de programação, desenvolvendo as funcionalidades e a integração com o banco de dados para dar continuidade à implementação do projeto.
+No momento, a equipe está na fase de programação, desenvolvendo as funcionalidades e a integração com o banco de dados para dar continuidade à implementação do projeto. 
 
 ## Link Protótipo Alta Fidelidade:
 [estetify.html](https://github.com/user-attachments/files/30683562/estetify.html)
