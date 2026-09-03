@@ -5,6 +5,7 @@
 - Eduarda Beatriz Pereira da Silva
 - Evelyn Nunes Carvalho
 - Ingrid Almeida de Oliveira
+- Felipi Braulio Sobottka
 
 ## Turma: 3ºMTEC-N Técnico em Desenvolvimento de Sistemas
 
