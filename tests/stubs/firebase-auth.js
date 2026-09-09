@@ -20,3 +20,12 @@ export function signOut() {
 export function sendPasswordResetEmail() {
   return Promise.reject(new Error('stub: sem rede nos testes de fumaça'));
 }
+export function updatePassword() {
+  return Promise.reject(new Error('stub: sem rede nos testes de fumaça'));
+}
+export function reauthenticateWithCredential() {
+  return Promise.reject(new Error('stub: sem rede nos testes de fumaça'));
+}
+export const EmailAuthProvider = {
+  credential: () => ({}),
+};

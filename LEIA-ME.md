@@ -45,6 +45,10 @@ Substitua pelos valores que você copiou no Passo 1.6. Salve o arquivo.
 As regras (`firestore.rules` e `storage.rules`) **precisam** ser publicadas no Console, senão o app roda
 mas ninguém consegue ler ou escrever nada.
 
+> ⚠️ **Se vocês já tinham publicado as regras antes**: o `firestore.rules` deste pacote mudou de novo (agora
+> permite que a profissional cadastre um "cliente avulso" sem conta/login). **Publiquem o arquivo atualizado
+> de novo no Console**, senão o botão de "Novo cliente" na tela Clientes vai dar erro de permissão.
+
 **Opção simples (colar no Console):**
 1. Firestore Database → aba **Regras** → apague o conteúdo → cole o conteúdo de `firestore.rules` → **Publicar**.
 2. Storage → aba **Regras** → apague o conteúdo → cole o conteúdo de `storage.rules` → **Publicar**.
@@ -91,29 +95,48 @@ Se quiser trazer os clientes, profissionais, serviços e agendamentos que já ex
   que existia entre `admin/disponibilidade.php` e `cliente/horarios.php`.
 - **Recuperação de senha** agora é 100% do Firebase Authentication (não precisa mais de `PHPMailer`,
   senha de app do Gmail, nem tabela `recuperacao_senha`).
-- **Três recursos novos**, iguais ao espírito das imagens de referência:
-  - **Mensagens**: chat em tempo real entre cliente e profissional (coleção `conversas` + subcoleção `mensagens`).
-  - **Campanhas**: o profissional cria campanhas/promoções e acompanha enviadas/abertas/taxa manualmente
-    (não há envio automático de WhatsApp/e-mail embutido — isso exigiria uma integração paga à parte).
-  - **Fidelidade**: cada profissional define pontos por real gasto e os benefícios por nível; pontos são
-    creditados automaticamente ao cliente quando um agendamento é marcado como **Concluído**.
-- **Tabelas removidas por não serem usadas em nenhuma tela do sistema original**: `avaliacoes` e `favoritos`
-  (existiam no banco mas não tinham nenhuma página que as usasse).
+- **A partir desta versão, o `index.html` usa como base o protótipo visual que o grupo já está usando/apresentando**
+  (o mesmo arquivo compartilhado no grupo), em vez de uma tela redesenhada — só a lógica de fake foi trocada
+  por Firebase de verdade. Isso significa que o visual, os nomes das telas e o comportamento dos botões
+  seguem o protótipo original o mais fielmente possível.
+- **Modelo "1 profissional por conta"**: o protótipo original tinha uma "Equipe" com vários profissionais
+  fictícios dentro de uma única conta. Como o sistema de vocês é 1 conta = 1 profissional (como já era antes),
+  a tela "Equipe" virou "Meu perfil profissional" (só os dados de quem está logado) e a agenda mostra uma
+  coluna só (a do profissional logado), não uma coluna por pessoa da equipe.
+- **Mensagens**: chat em tempo real entre cliente e profissional (coleção `conversas` + subcoleção `mensagens`).
+- **Campanhas**: o profissional cria campanhas/promoções e acompanha enviadas/abertas/taxa manualmente
+  (não há envio automático de WhatsApp/e-mail embutido — isso exigiria uma integração paga à parte).
+- **Fidelidade**: cada profissional define pontos por real gasto e os benefícios por nível; pontos são
+  creditados automaticamente ao cliente quando um agendamento é marcado como **Concluído**. Como agora um
+  cliente pode ter atendimentos com profissionais diferentes, a tela de fidelidade do cliente mostra
+  **um cartão de nível por profissional**, com o total de pontos ganho especificamente com aquela pessoa.
+- **Avaliações**: voltaram a ser uma tela de verdade — o cliente avalia (1 a 5 estrelas + comentário) um
+  atendimento já concluído, e a nota fica salva na coleção `feedbacks`.
+- **Agendamento pelo cliente (`agendar`)**: fluxo real de "marketplace" — o cliente escolhe primeiro a
+  profissional (entre todas as contas cadastradas como profissional), depois o serviço dela, depois vê os
+  horários realmente livres (calculados a partir da disponibilidade cadastrada por ela, menos os horários
+  já ocupados) e confirma. O agendamento entra como **pendente** até a profissional confirmar.
 
 ## Modelo de dados no Firestore
 
 ```
-usuarios/{uid}            -> nome, email, tipo(cliente|admin), telefone, foto, pontosFidelidade...
+usuarios/{uid}            -> nome, email, tipo(cliente|admin), telefone, foto, pontosFidelidade,
+                              semConta, criadoPor  (os 2 últimos só em clientes "avulsos", sem login,
+                              cadastrados manualmente pela profissional)
 categorias/{id}           -> nome
-servicos/{id}             -> idProfissional, idCategoria, nome, preco, duracao, imagem, ativo
+servicos/{id}             -> idProfissional, idCategoria, nome, preco, duracao, descricao, ativo
 disponibilidade/{id}      -> idProfissional, diaSemana, horarioInicio, horarioFim, ativo
-agendamentos/{id}         -> idCliente, idProfissional, idServico, data, horario, status, observacoes
+agendamentos/{id}         -> idCliente, idProfissional, idServico, data, horario, status, observacoes,
+                              servicoNomeSnapshot, valorSnapshot  (guardam o nome/preço do serviço no
+                              momento do agendamento, pra não sumir do histórico se o serviço for editado/excluído)
 feedbacks/{id}            -> idAgendamento, idCliente, idProfissional, nota, comentario
-conversas/{id}            -> participantes[], idCliente, idProfissional, ultimaMensagem...
-  conversas/{id}/mensagens/{id} -> remetente, texto, criadoEm
+conversas/{clienteUid_profissionalUid} -> idCliente, idProfissional, ultimaMensagem, ultimoEnvioEm...
+  conversas/{id}/mensagens/{id} -> remetente, texto, ts
 campanhas/{id}            -> idProfissional, titulo, descricao, status, enviadas, abertas
 fidelidadeConfig/{uidProf}-> pontosPorReal, niveis[{nome,pontosMin,pontosMax,beneficio}]
 fidelidadeHistorico/{id}  -> idCliente, idProfissional, idAgendamento, pontos
+prontuarios/{clienteUid_profissionalUid} -> anamnese, alergias, observações (LGPD)
+  prontuarios/{id}/evolucao/{id} -> data, descricao
 ```
 
 ## Limitações conhecidas (bom ser transparente sobre isso)
@@ -123,8 +146,23 @@ fidelidadeHistorico/{id}  -> idCliente, idProfissional, idAgendamento, pontos
   função de back-end (Cloud Functions) e credenciais de terceiros.
 - Buscas na tela de agendar/serviços são feitas no navegador (não é uma busca por texto completo do
   Firestore), o que é suficiente para o volume de dados de um TCC, mas não escala para milhares de serviços.
-- Fotos de perfil/serviço usam Firebase Storage; se você não ativar o Storage no Passo 1, o upload de foto
-  vai falhar (o resto do sistema continua funcionando normalmente).
+- **Upload de fotos (foto de perfil do cliente, foto de perfil da profissional, fotos de evolução do
+  prontuário) está desativado nesta versão** — isso porque enviar arquivos de verdade exige o **Firebase
+  Storage no plano pago (Blaze)**, e o projeto atual está no plano gratuito (Spark). Os botões de "Alterar
+  foto" continuam na tela, mas mostram um aviso em vez de enviar o arquivo. Dá pra ativar depois bastando
+  mudar o plano do projeto no Console e implementar o envio (o `storage.rules` já está pronto para isso).
+- **Código de verificação por e-mail (6 dígitos) no cadastro foi removido** — como não existe um serviço
+  de e-mail/SMS de verdade conectado, o cadastro vai direto pra escolha de perfil (admin/cliente) depois de
+  preencher os dados. A confirmação de identidade continua existindo (login com e-mail/senha do Firebase).
+- **Tela de "Nova senha" dentro do app é só visual** — a troca de senha de verdade acontece pelo link que o
+  Firebase Authentication manda por e-mail quando a pessoa clica em "Esqueceu a senha?" (fora do app). Isso
+  é mais seguro do que implementar uma tela própria de redefinição.
+- **"Personalização visual" e "Backup e dados"**, na tela de Configurações do profissional, são só
+  pré-visualização/informativo — trocar a cor do tema e "backup" manual não fazem nada, porque os dados já
+  são salvos automaticamente no Firebase a cada ação (não existe um botão de backup separado).
+- **Estoque, Fornecedores, Financeiro e Relatórios** do protótipo original não têm nenhum botão de menu que
+  leve até eles (são páginas "órfãs" no arquivo original, sem link nenhum) — por isso não foram implementadas
+  nesta versão. Se vocês quiserem essas telas de verdade, é só pedir que eu adiciono.
 
 ## Testes automatizados e CI/CD (GitHub Actions)
 
