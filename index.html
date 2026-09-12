@@ -893,13 +893,18 @@ async function viewClientePerfil(){
   $('#input-foto').addEventListener('change', async (e)=>{
     const arq = e.target.files[0]; if (!arq) return;
     toast('Enviando foto...');
-    const r = storageRef(storage, `perfis/${estado.user.uid}/${Date.now()}_${arq.name}`);
-    await uploadBytes(r, arq);
-    const url = await getDownloadURL(r);
-    await updateDoc(refDoc('usuarios', estado.user.uid), { foto: url });
-    estado.perfil.foto = url; cacheUsuarios.delete(estado.user.uid);
-    toast('Foto atualizada!', 'sucesso');
-    viewClientePerfil();
+    try{
+      const r = storageRef(storage, `perfis/${estado.user.uid}/${Date.now()}_${arq.name}`);
+      await uploadBytes(r, arq);
+      const url = await getDownloadURL(r);
+      await updateDoc(refDoc('usuarios', estado.user.uid), { foto: url });
+      estado.perfil.foto = url; cacheUsuarios.delete(estado.user.uid);
+      toast('Foto atualizada!', 'sucesso');
+      viewClientePerfil();
+    }catch(err){
+      console.error(err);
+      toast('Não foi possível enviar a foto agora. Tente novamente mais tarde.', 'erro');
+    }
   });
 }
 
@@ -1145,7 +1150,6 @@ async function viewAdminAgendamentos(filtro){
   `, '/a/agendamentos');
   ligarBuscaSimples('#busca-global');
 }
-
 async function viewAdminServicos(){
   appEl().innerHTML = layoutAdmin(`<div class="vazio"><div class="spinner" style="margin:0 auto;"></div></div>`, '/a/servicos');
   const uid = estado.user.uid;
@@ -1276,13 +1280,18 @@ async function viewAdminPerfil(){
   $('#input-foto-admin').addEventListener('change', async (e)=>{
     const arq = e.target.files[0]; if (!arq) return;
     toast('Enviando foto...');
-    const r = storageRef(storage, `perfis/${estado.user.uid}/${Date.now()}_${arq.name}`);
-    await uploadBytes(r, arq);
-    const url = await getDownloadURL(r);
-    await updateDoc(refDoc('usuarios', estado.user.uid), { foto: url });
-    estado.perfil.foto = url; cacheUsuarios.delete(estado.user.uid);
-    toast('Foto atualizada!', 'sucesso');
-    viewAdminPerfil();
+    try{
+      const r = storageRef(storage, `perfis/${estado.user.uid}/${Date.now()}_${arq.name}`);
+      await uploadBytes(r, arq);
+      const url = await getDownloadURL(r);
+      await updateDoc(refDoc('usuarios', estado.user.uid), { foto: url });
+      estado.perfil.foto = url; cacheUsuarios.delete(estado.user.uid);
+      toast('Foto atualizada!', 'sucesso');
+      viewAdminPerfil();
+    }catch(err){
+      console.error(err);
+      toast('Não foi possível enviar a foto agora. Tente novamente mais tarde.', 'erro');
+    }
   });
 }
 
