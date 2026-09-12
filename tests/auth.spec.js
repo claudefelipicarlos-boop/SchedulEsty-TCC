@@ -13,9 +13,10 @@
 // Se as variáveis não estiverem definidas, estes testes são pulados
 // automaticamente (não quebram o restante da suíte).
 //
-// Esta versão do app não usa mais roteamento por hash: o login acontece na
-// tela #screen-login (campos #login-email / #login-senha / #btn-login) e,
-// depois de autenticado, o app troca #auth-wrap por #app-shell.
+// Esta versão do app é uma SPA por hash: o login de cliente fica em
+// #/entrar-cliente, com <form data-form="login"> (campos input[name=email]/
+// input[name=senha], sem ids fixos). Depois de autenticado, o roteador troca
+// a rota para #/c/inicio e desenha o layout do cliente (.layout-cliente).
 const { test, expect } = require('@playwright/test');
 
 const EMAIL = process.env.TEST_CLIENTE_EMAIL;
@@ -25,25 +26,25 @@ test.describe('Login com Firebase (conta de teste real)', () => {
   test.skip(!EMAIL || !SENHA, 'TEST_CLIENTE_EMAIL / TEST_CLIENTE_SENHA não configurados');
 
   test('login com credenciais válidas entra na área logada', async ({ page }) => {
-    await page.goto('index.html');
+    await page.goto('index.html#/entrar-cliente');
 
-    await page.locator('#login-email').fill(EMAIL);
-    await page.locator('#login-senha').fill(SENHA);
-    await page.locator('#btn-login').click();
+    await page.locator('form[data-form="login"] input[name="email"]').fill(EMAIL);
+    await page.locator('form[data-form="login"] input[name="senha"]').fill(SENHA);
+    await page.locator('form[data-form="login"] button[type="submit"]').click();
 
-    // Espera o Firebase Authentication responder e o app trocar para o app-shell
-    await expect(page.locator('#app-shell')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('#auth-wrap')).toBeHidden();
+    // Espera o Firebase Authentication responder e o roteador desenhar a área do cliente
+    await expect(page.locator('.layout-cliente')).toBeVisible({ timeout: 15000 });
+    await expect(page).toHaveURL(/#\/c\/inicio$/);
   });
 
   test('login com senha errada mostra mensagem de erro', async ({ page }) => {
-    await page.goto('index.html');
+    await page.goto('index.html#/entrar-cliente');
 
-    await page.locator('#login-email').fill(EMAIL);
-    await page.locator('#login-senha').fill('senha-propositalmente-errada-123');
-    await page.locator('#btn-login').click();
+    await page.locator('form[data-form="login"] input[name="email"]').fill(EMAIL);
+    await page.locator('form[data-form="login"] input[name="senha"]').fill('senha-propositalmente-errada-123');
+    await page.locator('form[data-form="login"] button[type="submit"]').click();
 
-    await expect(page.locator('#login-erro .erro-form')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('#app-shell')).toBeHidden();
+    await expect(page.locator('#erro-login .erro-form')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('.layout-cliente')).toHaveCount(0);
   });
 });
