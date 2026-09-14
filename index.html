@@ -1509,11 +1509,22 @@ const acoes = {
   },
 };
 
+// Escreve uma mensagem de erro/sucesso num container de formulário (#erro-login
+// etc). Se a tela já mudou nesse meio-tempo (ex.: login bem-sucedido disparou
+// onAuthStateChanged e trocou a rota antes deste código rodar) o elemento pode
+// não existir mais no DOM — nesse caso mostra um toast em vez de travar com
+// "Cannot set properties of null".
+function mostrarMensagemForm(seletor, mensagem, classe){
+  const el = $(seletor);
+  if (el){ el.innerHTML = mensagem ? `<div class="${classe}">${mensagem}</div>` : ''; return; }
+  if (mensagem) toast(mensagem.replace(/<[^>]*>/g,''), classe === 'sucesso-form' ? 'sucesso' : 'erro');
+}
+
 const formularios = {
   'login': async (form)=>{
     const tipo = form.dataset.tipo;
     const fd = new FormData(form);
-    $('#erro-login').innerHTML = '';
+    mostrarMensagemForm('#erro-login', '', 'erro-form');
     const btn = form.querySelector('button[type=submit]');
     btn.disabled = true; btn.textContent = 'Entrando...';
     try{
@@ -1521,20 +1532,20 @@ const formularios = {
       const perfil = await buscarDoc('usuarios', cred.user.uid);
       if (!perfil || perfil.tipo !== tipo){
         await signOut(auth);
-        $('#erro-login').innerHTML = `<div class="erro-form">Essa conta não é de ${tipo==='cliente'?'cliente':'profissional'}. Entre pela tela correta.</div>`;
+        mostrarMensagemForm('#erro-login', `Essa conta não é de ${tipo==='cliente'?'cliente':'profissional'}. Entre pela tela correta.`, 'erro-form');
         btn.disabled = false; btn.textContent = 'Entrar';
       }
     }catch(err){
-      $('#erro-login').innerHTML = `<div class="erro-form">${esc(erroFirebase(err))}</div>`;
+      mostrarMensagemForm('#erro-login', esc(erroFirebase(err)), 'erro-form');
       btn.disabled = false; btn.textContent = 'Entrar';
     }
   },
   'cadastro': async (form)=>{
     const tipo = form.dataset.tipo;
     const fd = new FormData(form);
-    $('#erro-cadastro').innerHTML = '';
+    mostrarMensagemForm('#erro-cadastro', '', 'erro-form');
     if (fd.get('senha') !== fd.get('confirmarSenha')){
-      $('#erro-cadastro').innerHTML = `<div class="erro-form">As senhas não coincidem.</div>`;
+      mostrarMensagemForm('#erro-cadastro', 'As senhas não coincidem.', 'erro-form');
       return;
     }
     const btn = form.querySelector('button[type=submit]');
@@ -1546,7 +1557,7 @@ const formularios = {
       });
       toast('Conta criada com sucesso!', 'sucesso');
     }catch(err){
-      $('#erro-cadastro').innerHTML = `<div class="erro-form">${esc(erroFirebase(err))}</div>`;
+      mostrarMensagemForm('#erro-cadastro', esc(erroFirebase(err)), 'erro-form');
       btn.disabled = false; btn.textContent = 'Criar conta';
     }
   },
@@ -1554,9 +1565,9 @@ const formularios = {
     const fd = new FormData(form);
     try{
       await sendPasswordResetEmail(auth, fd.get('email').trim());
-      $('#erro-recuperar').innerHTML = `<div class="sucesso-form">Link enviado! Confira seu e-mail.</div>`;
+      mostrarMensagemForm('#erro-recuperar', 'Link enviado! Confira seu e-mail.', 'sucesso-form');
     }catch(err){
-      $('#erro-recuperar').innerHTML = `<div class="erro-form">${esc(erroFirebase(err))}</div>`;
+      mostrarMensagemForm('#erro-recuperar', esc(erroFirebase(err)), 'erro-form');
     }
   },
   'perfil-cliente': async (form)=>{
