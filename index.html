@@ -1645,7 +1645,7 @@ const formularios = {
 /* =====================================================================
    13) BOOTSTRAP — delegação de eventos global
 ===================================================================== */
-appEl().addEventListener('click', async (e)=>{
+document.addEventListener('click', async (e)=>{
   const el = e.target.closest('[data-action]');
   if (!el) return;
   const fn = acoes[el.dataset.action];
@@ -1654,7 +1654,7 @@ appEl().addEventListener('click', async (e)=>{
   try{ await fn(el.dataset, el, e); }
   catch(err){ console.error(err); toast(erroFirebase(err), 'erro'); }
 });
-appEl().addEventListener('submit', async (e)=>{
+document.addEventListener('submit', async (e)=>{
   const form = e.target.closest('form[data-form]');
   if (!form) return;
   e.preventDefault();
