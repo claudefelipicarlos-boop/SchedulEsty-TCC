@@ -82,6 +82,17 @@ h1,h2,h3,h4{font-weight:700;color:var(--texto);}
 .cartao-tipo .emoji{font-size:34px;display:block;margin-bottom:10px;}
 .cartao-tipo h3{font-size:15px;margin-bottom:4px;}
 .cartao-tipo p{font-size:12px;color:var(--texto-suave);}
+/* Página de apresentação (tela inicial antes do login) */
+.apresentacao{min-height:100vh;background:var(--fundo);padding:0 20px 30px;}
+.ap-topo{max-width:1000px;margin:0 auto;padding:22px 0;display:flex;justify-content:space-between;align-items:center;}
+.ap-hero{max-width:720px;margin:50px auto 40px;text-align:center;}
+.ap-hero h1{font-size:38px;line-height:1.2;margin-bottom:16px;}
+.ap-hero p{color:var(--texto-suave);font-size:16px;margin-bottom:26px;}
+.ap-botoes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.ap-cards{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}
+.ap-cards .emoji{font-size:30px;display:block;margin-bottom:8px;}
+.ap-cards p{font-size:13px;color:var(--texto-suave);}
+.ap-rodape{text-align:center;font-size:12px;color:var(--texto-suave);margin-top:40px;}
 .erro-form{background:var(--erro-fundo);color:var(--erro);padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;}
 .sucesso-form{background:var(--sucesso-fundo);color:var(--sucesso);padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;}
 
@@ -477,11 +488,12 @@ function aplicarRota(){
     if (hash === '/recuperar-senha') return renderRecuperarSenha();
     if (hash.startsWith('/cadastro/cliente')) return renderCadastro('cliente');
     if (hash.startsWith('/cadastro/admin')) return renderCadastro('admin');
-    return renderEscolha();
+    if (hash === '/entrar') return renderEscolha();
+    return renderApresentacao();
   }
 
   // já autenticado
-  if (['/', '', '/entrar-cliente','/entrar-admin','/recuperar-senha'].includes(hash) || hash.startsWith('/cadastro')) {
+  if (['/', '', '/entrar', '/entrar-cliente','/entrar-admin','/recuperar-senha'].includes(hash) || hash.startsWith('/cadastro')) {
     location.hash = estado.perfil?.tipo === 'admin' ? '#/a/inicio' : '#/c/inicio';
     return;
   }
@@ -543,6 +555,30 @@ async function fazerCadastro({ tipo, nome, email, senha, telefone, especialidade
 /* =====================================================================
    7) TELAS PÚBLICAS (login / cadastro / recuperação)
 ===================================================================== */
+function renderApresentacao(){
+  appEl().innerHTML = `
+  <div class="apresentacao">
+    <header class="ap-topo">
+      <div class="marca-titulo">SchedulEsty</div>
+      <a class="btn btn-primario" href="#/entrar">Entrar</a>
+    </header>
+    <section class="ap-hero">
+      <h1>Agendamentos de estética,<br>do jeito simples</h1>
+      <p>Chega de marcar horário por ligação e mensagem. Clientes agendam em poucos cliques e profissionais organizam a agenda em um só lugar.</p>
+      <div class="ap-botoes">
+        <a class="btn btn-primario" href="#/entrar">Entrar</a>
+        <a class="btn" href="#/cadastro/cliente" style="border:1.5px solid var(--rosa);color:var(--rosa);">Criar conta</a>
+      </div>
+    </section>
+    <section class="ap-cards">
+      <div class="cartao"><span class="emoji">📅</span><h3>Agende em poucos cliques</h3><p>Escolha o serviço, o profissional e um horário livre.</p></div>
+      <div class="cartao"><span class="emoji">🗂️</span><h3>Agenda organizada</h3><p>O profissional cadastra serviços e horários e acompanha os atendimentos.</p></div>
+      <div class="cartao"><span class="emoji">💬</span><h3>Mensagens e fidelidade</h3><p>Converse com o cliente e acumule pontos a cada atendimento.</p></div>
+    </section>
+    <footer class="ap-rodape">Projeto de TCC — 3º MTEC-N Desenvolvimento de Sistemas</footer>
+  </div>`;
+}
+
 function renderEscolha(){
   appEl().innerHTML = `
   <div class="tela-auth">
@@ -578,7 +614,7 @@ function renderLogin(tipo){
       </form>
       <p class="link-central"><a href="#/recuperar-senha" class="btn-texto">Esqueci minha senha</a></p>
       <p class="link-central">Não tem conta? <a href="#/cadastro/${tipo}" class="btn-texto">Cadastre-se</a></p>
-      <p class="link-central"><a href="#/">← Voltar</a></p>
+      <p class="link-central"><a href="#/entrar">← Voltar</a></p>
     </div>
   </div>`;
 }
@@ -601,7 +637,7 @@ function renderCadastro(tipo){
         <button class="btn btn-primario btn-bloco" type="submit">Criar conta</button>
       </form>
       <p class="link-central">Já tem conta? <a href="#/entrar-${tipo}" class="btn-texto">Entrar</a></p>
-      <p class="link-central"><a href="#/">← Voltar</a></p>
+      <p class="link-central"><a href="#/entrar">← Voltar</a></p>
     </div>
   </div>`;
 }
@@ -618,7 +654,7 @@ function renderRecuperarSenha(){
         <div class="campo"><label>E-mail</label><input type="email" name="email" required></div>
         <button class="btn btn-primario btn-bloco" type="submit">Enviar link</button>
       </form>
-      <p class="link-central"><a href="#/">← Voltar</a></p>
+      <p class="link-central"><a href="#/entrar">← Voltar</a></p>
     </div>
   </div>`;
 }
