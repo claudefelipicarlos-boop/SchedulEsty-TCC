@@ -83,16 +83,21 @@ h1,h2,h3,h4{font-weight:700;color:var(--texto);}
 .cartao-tipo h3{font-size:15px;margin-bottom:4px;}
 .cartao-tipo p{font-size:12px;color:var(--texto-suave);}
 /* Página de apresentação (tela inicial antes do login) */
-.apresentacao{min-height:100vh;background:var(--fundo);padding:0 20px 30px;}
-.ap-topo{max-width:1000px;margin:0 auto;padding:22px 0;display:flex;justify-content:space-between;align-items:center;}
-.ap-hero{max-width:720px;margin:50px auto 40px;text-align:center;}
-.ap-hero h1{font-size:38px;line-height:1.2;margin-bottom:16px;}
-.ap-hero p{color:var(--texto-suave);font-size:16px;margin-bottom:26px;}
-.ap-botoes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-.ap-cards{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}
-.ap-cards .emoji{font-size:30px;display:block;margin-bottom:8px;}
-.ap-cards p{font-size:13px;color:var(--texto-suave);}
-.ap-rodape{text-align:center;font-size:12px;color:var(--texto-suave);margin-top:40px;}
+.apresentacao{min-height:100vh;display:flex;flex-direction:column;padding:0 clamp(20px,6vw,80px);background:radial-gradient(circle at 15% 15%,#f4e9fb 0%,var(--fundo) 45%);}
+.ap-topo{width:100%;max-width:1200px;margin:0 auto;padding:26px 0;display:flex;justify-content:space-between;align-items:center;}
+.ap-topo .btn,.ap-botoes .btn{text-decoration:none;}
+.ap-centro{flex:1;display:flex;flex-direction:column;justify-content:center;gap:clamp(36px,7vh,72px);padding:20px 0;}
+.ap-hero{max-width:820px;margin:0 auto;text-align:center;}
+.ap-hero h1{font-size:clamp(34px,4.2vw,58px);line-height:1.15;margin-bottom:20px;}
+.ap-hero p{color:var(--texto-suave);font-size:clamp(15px,1.4vw,19px);line-height:1.6;max-width:640px;margin:0 auto 32px;}
+.ap-botoes{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.ap-botoes .btn{padding:15px 34px;font-size:16px;}
+.ap-cards{width:100%;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;}
+.ap-cards .cartao{padding:30px 26px;}
+.ap-cards .emoji{font-size:38px;display:block;margin-bottom:14px;}
+.ap-cards .cartao h3{font-size:18px;margin-bottom:8px;}
+.ap-cards .cartao p{font-size:14px;line-height:1.5;color:var(--texto-suave);}
+.ap-rodape{text-align:center;font-size:12px;color:var(--texto-suave);padding:22px 0;}
 .erro-form{background:var(--erro-fundo);color:var(--erro);padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;}
 .sucesso-form{background:var(--sucesso-fundo);color:var(--sucesso);padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;}
 
@@ -562,6 +567,7 @@ function renderApresentacao(){
       <div class="marca-titulo">SchedulEsty</div>
       <a class="btn btn-primario" href="#/entrar">Entrar</a>
     </header>
+    <main class="ap-centro">
     <section class="ap-hero">
       <h1>Agendamentos de estética,<br>do jeito simples</h1>
       <p>Chega de marcar horário por ligação e mensagem. Clientes agendam em poucos cliques e profissionais organizam a agenda em um só lugar.</p>
@@ -575,6 +581,7 @@ function renderApresentacao(){
       <div class="cartao"><span class="emoji">🗂️</span><h3>Agenda organizada</h3><p>O profissional cadastra serviços e horários e acompanha os atendimentos.</p></div>
       <div class="cartao"><span class="emoji">💬</span><h3>Mensagens e fidelidade</h3><p>Converse com o cliente e acumule pontos a cada atendimento.</p></div>
     </section>
+    </main>
     <footer class="ap-rodape">Projeto de TCC — 3º MTEC-N Desenvolvimento de Sistemas</footer>
   </div>`;
 }
