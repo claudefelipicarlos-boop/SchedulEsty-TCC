@@ -854,8 +854,11 @@ async function viewClienteAgendar(servicoId){
   }
 
   async function desenhar(dataEscolhida){
-    const { slots, semAtendimento } = await montarSlots(dataEscolhida);
-    const htmlSlots = semAtendimento
+    let slots = [], semAtendimento = false, erroSlots = false;
+    try { ({ slots, semAtendimento } = await montarSlots(dataEscolhida)); } catch (e) { console.warn("[Agendar] falha ao montar horários", e); erroSlots = true; }
+    const htmlSlots = erroSlots
+      ? '<p style="font-size:13.5px;color:var(--erro,#c0392b);margin-top:10px;">Não foi possível carregar os horários agora. Tente novamente em instantes.</p>'
+      : semAtendimento
       ? `<p style="font-size:13.5px;color:var(--texto-suave);margin-top:10px;">Este profissional não atende ${DIAS_SEMANA_LABEL[diaSemanaDe(dataEscolhida)].toLowerCase()}.</p>`
       : (slots.length
           ? `<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;">${slots.map(h=>`<button type="button" class="btn btn-sm ${estado.agendarSelecao===h?'btn-primario':'btn-secundario'}" data-action="escolher-horario" data-hora="${h}">${h}</button>`).join('')}</div>`
@@ -883,7 +886,7 @@ async function viewClienteAgendar(servicoId){
         </div>
       </div>
     `, '/c/agendar');
-    $('#input-data-agendar').addEventListener('change', (e)=>{ estado.agendarSelecao = null; desenhar(e.target.value); });
+    $('#input-data-agendar').addEventListener('change', (e)=>{ if (e.target.value.length !== 10 || e.target.value < hojeISO()) return; estado.agendarSelecao = null; desenhar(e.target.value); });
   }
   estado.redesenharAgendar = desenhar;
   await desenhar(hojeISO());
