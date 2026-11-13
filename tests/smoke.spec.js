@@ -13,9 +13,9 @@ test.beforeEach(async ({ page }) => {
   await mockFirebase(page);
 });
 
-test.describe('Tela inicial', () => {
+test.describe('Apresentação', () => { test('a página inicial mostra a apresentação e o botão Entrar leva à escolha de usuário', async ({ page }) => { await page.goto('index.html'); await expect(page.getByRole('heading', { name: /Agendamentos de estética/ })).toBeVisible(); await page.getByRole('link', { name: 'Entrar' }).first().click(); await expect(page).toHaveURL(/#\/entrar$/); await expect(page.getByText('Como você quer entrar?')).toBeVisible(); }); }); test.describe('Tela inicial', () => {
   test('carrega e mostra a tela de escolha (cliente/profissional)', async ({ page }) => {
-    await page.goto('index.html');
+    await page.goto('index.html#/entrar');
     await expect(page).toHaveTitle(/SchedulEsty/i);
     await expect(page.getByText('Como você quer entrar?')).toBeVisible();
     await expect(page.locator('.cartao-tipo', { hasText: 'Sou cliente' })).toBeVisible();
@@ -23,7 +23,7 @@ test.describe('Tela inicial', () => {
   });
 
   test('não mostra tela em branco (#app tem conteúdo)', async ({ page }) => {
-    await page.goto('index.html');
+    await page.goto('index.html#/entrar');
     await expect(page.locator('#app')).toBeVisible();
     const html = await page.locator('#app').innerHTML();
     expect(html.trim().length).toBeGreaterThan(0);
@@ -32,7 +32,7 @@ test.describe('Tela inicial', () => {
 
 test.describe('Navegação entre telas de autenticação', () => {
   test('"Sou cliente" leva ao login de cliente', async ({ page }) => {
-    await page.goto('index.html');
+    await page.goto('index.html#/entrar');
     await page.locator('.cartao-tipo', { hasText: 'Sou cliente' }).click();
     await expect(page).toHaveURL(/#\/entrar-cliente$/);
     await expect(page.getByRole('heading', { name: 'Entrar como cliente' })).toBeVisible();
@@ -41,14 +41,14 @@ test.describe('Navegação entre telas de autenticação', () => {
   });
 
   test('"Sou profissional" leva ao login de profissional', async ({ page }) => {
-    await page.goto('index.html');
+    await page.goto('index.html#/entrar');
     await page.locator('.cartao-tipo', { hasText: 'Sou profissional' }).click();
     await expect(page).toHaveURL(/#\/entrar-admin$/);
     await expect(page.getByRole('heading', { name: 'Entrar como profissional' })).toBeVisible();
   });
 
   test('"Cadastre-se como cliente" leva ao formulário de cadastro', async ({ page }) => {
-    await page.goto('index.html');
+    await page.goto('index.html#/entrar');
     await page.getByRole('link', { name: 'Cadastre-se como cliente' }).click();
     await expect(page).toHaveURL(/#\/cadastro\/cliente$/);
     await expect(page.locator('form[data-form="cadastro"] input[name="nome"]')).toBeVisible();
@@ -65,7 +65,7 @@ test.describe('Navegação entre telas de autenticação', () => {
   });
 
   test('"Esqueci minha senha" leva à tela de recuperação', async ({ page }) => {
-    await page.goto('index.html');
+    await page.goto('index.html#/entrar');
     await page.locator('.cartao-tipo', { hasText: 'Sou cliente' }).click();
     await page.getByRole('link', { name: 'Esqueci minha senha' }).click();
     await expect(page).toHaveURL(/#\/recuperar-senha$/);
